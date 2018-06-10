@@ -9,7 +9,32 @@ class Search extends Component {
         super(props);
         this.state = {
             results: [],
+            token: '',
+            error: null,
         };
+    }
+    componentDidMount() {
+        let token = window.localStorage.getItem('khToken');
+        if (!token) {
+            const url = 'https://private-anon-56685cd0e2-knowledgehound.apiary-mock.com/authentication/api/';
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            };
+            const body = "username=candidate@knowledgehound.com&password=KH1sGreat​";
+            fetch(url, {
+                method: 'POST',
+                headers,
+                body,
+            }).then((response) => response.json())
+            .then((json) => {
+                window.localStorage.setItem('khToken', json.JWT);
+                token = json.JWT;
+            }).catch((error) => {
+                console.log('error: ', error);
+                this.setState({ error });
+            })
+        }
+        !!token && this.setState({ token });
     }
     render() {
         const { results } = this.state;
