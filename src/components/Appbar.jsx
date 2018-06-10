@@ -21,27 +21,28 @@ const styles = {
   },
 };
 
-const ButtonAppBar = (props) => {
-  const { classes, title } = props;
-  return (
-    <div className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="title" color="inherit" className={classes.flex}>
-            {title}
-          </Typography>
-          <Button color="inherit">Login</Button>
-        </Toolbar>
-      </AppBar>
-    </div>
-  );
-}
+const ButtonAppBar = ({ classes, title }) => (
+  <div className={classes.root}>
+    <AppBar position="static">
+      <Toolbar>
+        <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
+          <MenuIcon />
+        </IconButton>
+        <Typography variant="title" color="inherit" className={classes.flex}>
+          {title}
+        </Typography>
+        <Button color="inherit">Login</Button>
+      </Toolbar>
+    </AppBar>
+  </div>
+);
 
 ButtonAppBar.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.shape({
+    root: PropTypes.any,
+    flex: PropTypes.any,
+    menuButton: PropTypes.any,
+  }).isRequired,
   title: PropTypes.string.isRequired,
 };
 
