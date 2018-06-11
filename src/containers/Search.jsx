@@ -1,5 +1,7 @@
 /* global window, fetch */
 import React, { Component } from 'react';
+import Grid from '@material-ui/core/Grid';
+
 import Appbar from '../components/Appbar';
 import Searchbar from '../components/Searchbar';
 import Result from '../components/Result';
@@ -15,6 +17,7 @@ class Search extends Component {
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.expandClick = this.expandClick.bind(this);
   }
   componentDidMount() {
     /* eslint-disable react/no-did-mount-set-state */
@@ -58,11 +61,24 @@ class Search extends Component {
     };
     fetch(url, options)
       .then(response => response.json())
-      .then(json => this.setState({ results: json.results }))
+      .then(json => this.setState({
+        results: json.results,
+        expanded: json.results.map(() => false),
+      }))
       .catch(error => this.setState({ error }));
   }
+  expandClick(i) {
+    return (e) => {
+      e.preventDefault();
+      const { expanded } = this.state;
+      expanded[i] = !expanded[i];
+      this.setState({
+        expanded,
+      });
+    };
+  }
   render() {
-    const { results, error } = this.state;
+    const { results, error, expanded } = this.state;
     const title = 'KH Code Challenge';
     return (
       <div>
@@ -71,7 +87,27 @@ class Search extends Component {
           <Searchbar onChange={this.onChange} onSubmit={this.onSubmit} />
         </div>
         <div>
-          {results.map(result => <Result title={result.question} content={result.link} />)}
+          <Grid container spacing={16}>
+            {results.map((result, i) => {
+              const {
+                link, type, study, id, question, duplicates, explanation,
+              } = result;
+              const content = {
+                link, type, duplicates, explanation,
+              };
+              return (
+                <Grid key={id} item xs={12} lg={4}>
+                  <Result
+                    title={question}
+                    date={study.study_date}
+                    studyName={study.name}
+                    expandClick={this.expandClick(i)}
+                    expanded={expanded[i]}
+                    {...content}
+                  />
+                </Grid>);
+            })}
+          </Grid>
         </div>
         <div>
           {/* temp placeholder for error message */}
