@@ -20,6 +20,12 @@ const styles = {
   },
 };
 
+/**
+ * Pure Component to render the Appbar at the top.
+ *
+ * @param {object} classes classes created by withStyles helper
+ * @param {string} title title to display in appbar
+ */
 const ButtonAppBar = ({ classes, title }) => (
   <div className={classes.root}>
     <AppBar position="static">

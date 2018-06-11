@@ -8,6 +8,16 @@ import Result from '../components/Result';
 import Login from '../components/Login';
 import Pagination from '../components/Pagination';
 
+/**
+ * Utilty to perform API search.  Makes REST GET call and then
+ * updates the react state with the results on success or with
+ * the error on failure.
+ * @param {string} searchTerm the query string to send to the API
+ * @param {number} page the value of the page for pagination
+ * @param {string} token the JWT string to set as auth header
+ * @param {string} setState the React setState function
+ * @returns {void}
+ */
 const performSearch = ({
   searchTerm, page, token, setState,
 }) => {
@@ -30,7 +40,19 @@ const performSearch = ({
     .catch(error => setState({ error }));
 };
 
+/**
+ * React Container for Search page
+ *
+ * @class Search
+ * @extends {Component}
+ */
 class Search extends Component {
+  /**
+   * Creates an instance of Search Container. Initializes state,
+   * binds all class methods passed to pure components to 'this'.
+   * @param {*} props
+   * @memberof Search
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -47,11 +69,18 @@ class Search extends Component {
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.expandClick = this.expandClick.bind(this);
-    this.loginOnChange = this.loginOnChange.bind(this);
     this.loginSubmit = this.loginSubmit.bind(this);
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
   }
+
+  /**
+   * Checks if JWT already exists in local storage.  If
+   * so, sets the state to loggedIn and sets the token
+   * to the JWT from local storage.
+   *
+   * @memberof Search
+   */
   componentDidMount() {
     /* eslint-disable react/no-did-mount-set-state */
     /* https://github.com/airbnb/javascript/issues/684 */
@@ -63,11 +92,14 @@ class Search extends Component {
       });
     }
   }
-  onChange(e) {
-    e.preventDefault();
-    const searchTerm = e.target.value;
-    this.setState({ searchTerm });
-  }
+  /**
+   * Event handler for onClick event from the search button.
+   * Uses the perform search utility to make the API call
+   * and update the React state with the results or error.
+   *
+   * @param {*} e onClick event
+   * @memberof Search
+   */
   onSubmit(e) {
     e.preventDefault();
     const { searchTerm, token } = this.state;
@@ -78,7 +110,17 @@ class Search extends Component {
       setState: this.setState.bind(this),
     });
   }
-  loginOnChange(name) {
+  /**
+   * Higher order function to create a function for updating state
+   * returns function which updates state object with key that
+   * corresponds to the parameter 'name' passed to it.  Used by all
+   * Text input fields in the app.
+   *
+   * @param {string} name key of state object to update
+   * @returns {function} an event handler for updating react state
+   * @memberof Search
+   */
+  onChange(name) {
     return (e) => {
       e.preventDefault();
       this.setState({
@@ -86,6 +128,16 @@ class Search extends Component {
       });
     };
   }
+  /**
+   * HOF to create event handler that keeps track of the toggle
+   * state for each search result.  Uses the page index and toggles
+   * the value of the expanded array at that index.  This is called
+   * when a user clicks on the 'Match Details v' button.
+   *
+   * @param {*} i index of the result
+   * @returns {function} Event handler to set toggle state
+   * @memberof Search
+   */
   expandClick(i) {
     return (e) => {
       e.preventDefault();
@@ -96,7 +148,17 @@ class Search extends Component {
       });
     };
   }
-  loginSubmit() {
+  /**
+   * Event handler for logging in.  Performs POST to API endpoint
+   * and sets the token value and loggedIn value in state on success.
+   * Sets the error value to the error on failure.  This is dispatched
+   * when a user hits the 'login' button.
+   *
+   * @param {event} e event being handled when hitting 'login' button
+   * @memberof Search
+   */
+  loginSubmit(e) {
+    e.preventDefault();
     const { username, password } = this.state;
     const url = 'https://api.knowledgehound.com/authentication/api/';
     const headers = {
@@ -116,6 +178,13 @@ class Search extends Component {
         this.setState({ error });
       });
   }
+  /**
+   * Method for paging forward through search results.
+   * Dispatched when user clicks 'next' button.
+   *
+   * @param {event} e event from 'next' button
+   * @memberof Search
+   */
   nextPage(e) {
     e.preventDefault();
     const { lastSearch, token, page } = this.state;
@@ -126,6 +195,13 @@ class Search extends Component {
       setState: this.setState.bind(this),
     });
   }
+  /**
+   * Method for paging backward through search results.
+   * Dispatched when user clicks 'previous' button.
+   *
+   * @param {event} e event from 'previous' button
+   * @memberof Search
+   */
   prevPage(e) {
     e.preventDefault();
     const { lastSearch, token, page } = this.state;
@@ -136,6 +212,12 @@ class Search extends Component {
       setState: this.setState.bind(this),
     });
   }
+  /**
+   * Container's render method.
+   *
+   * @returns {object} React component
+   * @memberof Search
+   */
   render() {
     const {
       results, error, expanded, loggedIn, username, password, page,
@@ -144,13 +226,13 @@ class Search extends Component {
     const loginProps = {
       username,
       password,
-      handleChange: this.loginOnChange,
+      handleChange: this.onChange,
       onSubmit: this.loginSubmit,
     };
     const Main = (
       <React.Fragment>
         <div>
-          <Searchbar onChange={this.onChange} onSubmit={this.onSubmit} />
+          <Searchbar onChange={this.onChange('searchTerm')} onSubmit={this.onSubmit} />
         </div>
         <div>
           <Grid container spacing={16}>

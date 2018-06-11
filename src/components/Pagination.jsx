@@ -13,6 +13,14 @@ const styles = theme => ({
   }),
 });
 
+/**
+ * Pure Component for pagination controls.
+ *
+ * @param {object} classes classes create by withStyles helper
+ * @param {bool} disabled whether to disable the previous button
+ * @param {function} forward event handler for 'next' button
+ * @param {function} back event handler for 'previous' button
+ */
 const Pagination = ({
   classes, disabled, forward, back,
 }) => (
