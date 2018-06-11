@@ -28,13 +28,16 @@ const styles = {
     backgroundColor: blue[500],
     textAlign: 'center',
   },
+  title: {
+    color: 'white',
+  },
 };
 
 const Result = ({
   classes, title, studyName, date, expanded, expandClick, ...content
 }) => (
   <Card className={classes.card}>
-    <CardHeader className={classes.header} title={title} subheader={`Date: ${date}`} />
+    <CardHeader className={classes.header} classes={{ title: classes.title }} title={title} subheader={`Date: ${date}`} />
     <CardContent>
       Study Name: {studyName}
     </CardContent>
@@ -42,7 +45,7 @@ const Result = ({
       <IconButton className={classes.link}>
         <a href={content.link} target="_blank" rel="noopener noreferrer"><LinkIcon /></a>
       </IconButton>
-      <Button onClick={expandClick} className={classes.expand} aria-expanded={expanded} aria-label="Show more">
+      <Button color="primary" variant="contained" onClick={expandClick} className={classes.expand} aria-expanded={expanded} aria-label="Show more">
         Match Details
         {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> }
       </Button>
