@@ -29,7 +29,7 @@ const Searchbar = ({ classes, onChange, onSubmit }) => (
     <Grid container spacing={8} >
       <Grid item lg={4} />
       <Grid item lg={4}>
-        <Grid container spacing={8} justify="center" alignItems="center">
+        <Grid container spacing={8} direction="column" justify="center" alignItems="center">
           <Grid item>
             <img className={classes.dogImage} src={dogImage} alt="dogimage" />
           </Grid>

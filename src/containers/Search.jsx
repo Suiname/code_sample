@@ -81,17 +81,6 @@ class Search extends Component {
    *
    * @memberof Search
    */
-  componentDidMount() {
-    /* eslint-disable react/no-did-mount-set-state */
-    /* https://github.com/airbnb/javascript/issues/684 */
-    const token = window.localStorage.getItem('khToken');
-    if (token) {
-      this.setState({
-        loggedIn: true,
-        token,
-      });
-    }
-  }
   /**
    * Event handler for onClick event from the search button.
    * Uses the perform search utility to make the API call
@@ -171,7 +160,6 @@ class Search extends Component {
       body,
     }).then(response => response.json())
       .then((json) => {
-        window.localStorage.setItem('khToken', json.JWT);
         const token = json.JWT;
         this.setState({ token, loggedIn: true });
       }).catch((error) => {
