@@ -6,6 +6,29 @@ import Appbar from '../components/Appbar';
 import Searchbar from '../components/Searchbar';
 import Result from '../components/Result';
 import Login from '../components/Login';
+import Pagination from '../components/Pagination';
+
+const performSearch = ({
+  searchTerm, page, token, setState,
+}) => {
+  const url = `https://api.knowledgehound.com/search/?query=${searchTerm}&type=question&group_duplicates=question&page_size=12&page=${page}`;
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
+  const options = {
+    method: 'GET',
+    headers,
+  };
+  !!searchTerm && fetch(url, options)
+    .then(response => response.json())
+    .then(json => setState({
+      results: json.results,
+      expanded: json.results.map(() => false),
+      lastSearch: searchTerm,
+      page,
+    }))
+    .catch(error => setState({ error }));
+};
 
 class Search extends Component {
   constructor(props) {
@@ -18,12 +41,16 @@ class Search extends Component {
       loggedIn: false,
       username: '',
       password: '',
+      page: 1,
+      lastSearch: '',
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.expandClick = this.expandClick.bind(this);
     this.loginOnChange = this.loginOnChange.bind(this);
     this.loginSubmit = this.loginSubmit.bind(this);
+    this.nextPage = this.nextPage.bind(this);
+    this.prevPage = this.prevPage.bind(this);
   }
   componentDidMount() {
     /* eslint-disable react/no-did-mount-set-state */
@@ -44,21 +71,12 @@ class Search extends Component {
   onSubmit(e) {
     e.preventDefault();
     const { searchTerm, token } = this.state;
-    const url = `https://api.knowledgehound.com/search/?query=${searchTerm}&type=question&group_duplicates=question`;
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
-    const options = {
-      method: 'GET',
-      headers,
-    };
-    !!searchTerm && fetch(url, options)
-      .then(response => response.json())
-      .then(json => this.setState({
-        results: json.results,
-        expanded: json.results.map(() => false),
-      }))
-      .catch(error => this.setState({ error }));
+    performSearch({
+      searchTerm,
+      page: 1,
+      token,
+      setState: this.setState.bind(this),
+    });
   }
   loginOnChange(name) {
     return (e) => {
@@ -79,11 +97,12 @@ class Search extends Component {
     };
   }
   loginSubmit() {
+    const { username, password } = this.state;
     const url = 'https://api.knowledgehound.com/authentication/api/';
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
-    const body = 'username=candidate%40knowledgehound.com&password=KH1sGreat';
+    const body = `username=${encodeURIComponent(username)}&password=${password}`;
     fetch(url, {
       method: 'POST',
       headers,
@@ -97,9 +116,29 @@ class Search extends Component {
         this.setState({ error });
       });
   }
+  nextPage(e) {
+    e.preventDefault();
+    const { lastSearch, token, page } = this.state;
+    performSearch({
+      searchTerm: lastSearch,
+      page: page + 1,
+      token,
+      setState: this.setState.bind(this),
+    });
+  }
+  prevPage(e) {
+    e.preventDefault();
+    const { lastSearch, token, page } = this.state;
+    performSearch({
+      searchTerm: lastSearch,
+      page: page - 1,
+      token,
+      setState: this.setState.bind(this),
+    });
+  }
   render() {
     const {
-      results, error, expanded, loggedIn, username, password,
+      results, error, expanded, loggedIn, username, password, page,
     } = this.state;
     const title = 'KH Code Challenge';
     const loginProps = {
@@ -115,6 +154,10 @@ class Search extends Component {
         </div>
         <div>
           <Grid container spacing={16}>
+            {results.length &&
+            <Grid item xs={12} lg={12}>
+              <Pagination disabled={page === 1} forward={this.nextPage} back={this.prevPage} />
+            </Grid>}
             {results.map((result, i) => {
               const {
                 link, type, study, id, question, duplicates, explanation,
