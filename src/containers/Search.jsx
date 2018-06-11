@@ -59,7 +59,7 @@ class Search extends Component {
       method: 'GET',
       headers,
     };
-    fetch(url, options)
+    !!searchTerm && fetch(url, options)
       .then(response => response.json())
       .then(json => this.setState({
         results: json.results,

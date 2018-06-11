@@ -6,7 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
+import khIcon from '../assets/kh-dog.svg';
 
 const styles = {
   root: {
@@ -26,7 +26,7 @@ const ButtonAppBar = ({ classes, title }) => (
     <AppBar position="static">
       <Toolbar>
         <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-          <MenuIcon />
+          <img src={khIcon} alt="khIcon" />
         </IconButton>
         <Typography variant="title" color="inherit" className={classes.flex}>
           {title}
