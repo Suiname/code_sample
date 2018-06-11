@@ -1,6 +1,7 @@
 /* global window, fetch */
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
+import 'whatwg-fetch';
 
 import Appbar from '../components/Appbar';
 import Searchbar from '../components/Searchbar';
