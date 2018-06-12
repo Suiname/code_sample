@@ -27,8 +27,8 @@ const styles = {
 const Searchbar = ({ classes, onChange, onSubmit }) => (
   <div className={classes.root} >
     <Grid container spacing={8} >
-      <Grid item lg={4} />
-      <Grid item lg={4}>
+      <Grid item lg={4} xs={12} />
+      <Grid item lg={4} xs={12}>
         <Grid container spacing={8} direction="column" justify="center" alignItems="center">
           <Grid item>
             <img className={classes.dogImage} src={dogImage} alt="dogimage" />
@@ -47,7 +47,7 @@ const Searchbar = ({ classes, onChange, onSubmit }) => (
           </Grid>
         </Grid>
       </Grid>
-      <Grid item lg={4} />
+      <Grid item lg={4} xs={12} />
     </Grid>
   </div>);
 

@@ -8,6 +8,7 @@ import Searchbar from '../components/Searchbar';
 import Result from '../components/Result';
 import Login from '../components/Login';
 import Pagination from '../components/Pagination';
+import Errors from '../components/Errors';
 
 /**
  * Utilty to perform API search.  Makes REST GET call and then
@@ -31,12 +32,19 @@ const performSearch = ({
     headers,
   };
   !!searchTerm && fetch(url, options)
-    .then(response => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        const error = new Error(`Received ${response.status} Response from server`);
+        throw error;
+      }
+      return response.json();
+    })
     .then(json => setState({
       results: json.results,
       expanded: json.results.map(() => false),
       lastSearch: searchTerm,
       page,
+      error: null,
     }))
     .catch(error => setState({ error }));
 };
@@ -73,8 +81,8 @@ class Search extends Component {
     this.loginSubmit = this.loginSubmit.bind(this);
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
+    this.clearError = this.clearError.bind(this);
   }
-
   /**
    * Checks if JWT already exists in local storage.  If
    * so, sets the state to loggedIn and sets the token
@@ -82,6 +90,17 @@ class Search extends Component {
    *
    * @memberof Search
    */
+  componentDidMount() {
+    /* eslint-disable react/no-did-mount-set-state */
+    /* https://github.com/airbnb/javascript/issues/684 */
+    const token = window.localStorage.getItem('khToken');
+    if (token) {
+      this.setState({
+        loggedIn: true,
+        token,
+      });
+    }
+  }
   /**
    * Event handler for onClick event from the search button.
    * Uses the perform search utility to make the API call
@@ -159,9 +178,16 @@ class Search extends Component {
       method: 'POST',
       headers,
       body,
-    }).then(response => response.json())
+    }).then((response) => {
+      if (!response.ok) {
+        const error = new Error(`Received ${response.status} Response from server`);
+        throw error;
+      }
+      return response.json();
+    })
       .then((json) => {
         const token = json.JWT;
+        window.localStorage.setItem('khToken', token);
         this.setState({ token, loggedIn: true });
       }).catch((error) => {
         this.setState({ error });
@@ -201,6 +227,12 @@ class Search extends Component {
       setState: this.setState.bind(this),
     });
   }
+  clearError(e) {
+    e.preventDefault();
+    this.setState({
+      error: null,
+    });
+  }
   /**
    * Container's render method.
    *
@@ -237,7 +269,7 @@ class Search extends Component {
                 link, type, duplicates, explanation,
               };
               return (
-                <Grid key={id} item xs={12} lg={4}>
+                <Grid key={id} item xs={12} md={4}>
                   <Result
                     title={question}
                     date={study.study_date}
@@ -250,16 +282,13 @@ class Search extends Component {
             })}
           </Grid>
         </div>
-        <div>
-          {/* temp placeholder for error message */}
-          {(error && error.message) || null }
-        </div>
       </React.Fragment>
     );
     return (
       <div>
         <Appbar title={title} />
         {loggedIn ? Main : <Login {...loginProps} />}
+        <Errors error={error} clearError={this.clearError} />
       </div>
     );
   }
